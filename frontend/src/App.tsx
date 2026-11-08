@@ -249,9 +249,9 @@ function App() {
                   <Route path="inventory" element={<InventoryPage />} />
                   <Route path="files" element={<FileManagerPage />} />
                   <Route path="files/trash" element={<LibraryTrashPage />} />
-                  <Route path="model-sources" element={<PermissionRoute permission={['makerworld:view', 'manyfold:view']}><ModelSourcesPage /></PermissionRoute>} />
+                  <Route path="model-sources" element={<PermissionRoute permission={['makerworld:view', 'manyfold:view', 'library:read_own', 'library:read_all', 'library:read']}><ModelSourcesPage /></PermissionRoute>} />
                   {/* The page was MakerWorld-only until Manyfold joined it (#1471); old links and bookmarks still land on that tab. */}
-                  <Route path="makerworld" element={<Navigate to="/model-sources?tab=makerworld" replace />} />
+                  <Route path="makerworld" element={<Navigate to="/model-sources?tab=import" replace />} />
                   <Route path="settings" element={<PermissionRoute permission="settings:read"><SettingsPage /></PermissionRoute>} />
                   <Route path="groups/new" element={<PermissionRoute permission="groups:create"><GroupEditPage /></PermissionRoute>} />
                   <Route path="groups/:id/edit" element={<PermissionRoute permission="groups:update"><GroupEditPage /></PermissionRoute>} />

@@ -11,7 +11,7 @@ export default {
     finance: '재무',
     files: '파일 관리자',
     makerworld: 'MakerWorld',
-    modelSources: '모델 소스',
+    modelSources: '모델',
     notifications: '알림',
     settings: '설정',
     system: '시스템',
@@ -7499,7 +7499,7 @@ export default {
   },
 
   modelSources: {
-    title: '모델 소스',
+    title: '모델',
     tabMakerworld: 'MakerWorld',
     tabManyfold: 'Manyfold',
   },

@@ -747,9 +747,8 @@ describe('Layout', () => {
           }),
         ),
       );
-      // AuthProvider needs a token in localStorage to fetch /auth/me; the
-      // value isn't validated by the mocked server.
-      window.localStorage.setItem('auth_token', 'test-token');
+      // localStorage is a no-op mock; install the token in the API client.
+      setAuthToken('test-token', 'session');
     };
 
     const findMakerWorldNavLink = () => {
@@ -760,11 +759,8 @@ describe('Layout', () => {
       return document.querySelector('aside a[href="/model-sources"]');
     };
 
-    it('hides the Model Sources nav entry when the user has neither source permission', async () => {
-      // Standard user without the MakerWorld permission. Every other
-      // permission they hold (library:read, etc.) is irrelevant here — the
-      // gate is per-entry and the MakerWorld entry must not render.
-      enableAuthWithUser(['library:read', 'archives:read', 'queue:read']);
+    it('hides Models when the user cannot view any model source', async () => {
+      enableAuthWithUser(['archives:read', 'queue:read']);
 
       render(<Layout />);
 
@@ -773,7 +769,7 @@ describe('Layout', () => {
         // entry (Files / Archives) confirms the sidebar finished mounting.
         const sidebar = document.querySelector('aside');
         expect(sidebar).toBeInTheDocument();
-        expect(sidebar?.querySelector('a[href="/files"]')).toBeInTheDocument();
+        expect(sidebar?.querySelector('a[href="/archives"]')).toBeInTheDocument();
       });
 
       await waitFor(() => expect(findMakerWorldNavLink()).toBeNull());
@@ -794,8 +790,15 @@ describe('Layout', () => {
       });
     });
 
-    it('shows the Model Sources nav entry with manyfold:view alone (#1471)', async () => {
-      enableAuthWithUser(['library:read', 'manyfold:view']);
+    it.each(['library:read', 'library:read_own', 'library:read_all'])('shows the single Models entry for Printables with %s', async (permission) => {
+      enableAuthWithUser([permission]);
+      render(<Layout />);
+      await waitFor(() => expect(findMakerWorldNavLink()).toBeInTheDocument());
+      await waitFor(() => expect(document.querySelectorAll('aside a[href="/model-sources"]')).toHaveLength(1));
+    });
+
+    it('shows the Models nav entry with manyfold:view alone (#1471)', async () => {
+      enableAuthWithUser(['manyfold:view']);
 
       render(<Layout />);
 

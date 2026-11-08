@@ -8,7 +8,7 @@ import re
 import secrets
 import shutil
 import time
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path, PurePosixPath
@@ -62,6 +62,7 @@ from backend.app.api.routes import (
     manyfold,
     metrics,
     mfa,
+    models,
     notification_templates,
     notifications,
     obico,
@@ -12449,7 +12450,15 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logging.warning("Failed to sync virtual printers: %s", e)
 
+    # Release abandoned online slice sources after refresh/disconnect, including
+    # leftovers from an earlier process. Saved models never use this source type.
+    models_cleanup_task = asyncio.create_task(models.cleanup_temporary_models_loop())
+
     yield
+
+    models_cleanup_task.cancel()
+    with suppress(asyncio.CancelledError):
+        await models_cleanup_task
 
     # Shutdown
     print_scheduler.stop()
@@ -13107,6 +13116,7 @@ app.include_router(pipeline_runs.pipeline_run_router, prefix=app_settings.api_pr
 app.include_router(slicer_presets.router, prefix=app_settings.api_prefix)
 app.include_router(archive_purge.router, prefix=app_settings.api_prefix)
 app.include_router(makerworld.router, prefix=app_settings.api_prefix)
+app.include_router(models.router, prefix=app_settings.api_prefix)
 app.include_router(manyfold.router, prefix=app_settings.api_prefix)
 app.include_router(api_keys.router, prefix=app_settings.api_prefix)
 app.include_router(connected_apps.router, prefix=app_settings.api_prefix)

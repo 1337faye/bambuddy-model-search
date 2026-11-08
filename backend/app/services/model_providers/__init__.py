@@ -27,10 +27,12 @@ from backend.app.services.model_providers.base import (
 )
 from backend.app.services.model_providers.makerworld import makerworld_provider
 from backend.app.services.model_providers.manyfold import manyfold_provider
+from backend.app.services.model_providers.printables import printables_provider
 from backend.app.services.model_providers.registry import ModelProviderRegistry, registry
 
 registry.register(makerworld_provider)
 registry.register(manyfold_provider)
+registry.register(printables_provider)
 
 __all__ = [
     "ModelProvider",
@@ -51,5 +53,6 @@ __all__ = [
     "ProviderUrlError",
     "makerworld_provider",
     "manyfold_provider",
+    "printables_provider",
     "registry",
 ]

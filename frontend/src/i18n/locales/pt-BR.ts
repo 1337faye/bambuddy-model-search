@@ -12,7 +12,7 @@ export default {
     finance: 'Finanças',
     files: 'Gerenciador de Arquivos',
     makerworld: 'MakerWorld',
-    modelSources: 'Fontes de modelos',
+    modelSources: 'Modelos',
     notifications: 'Notificações',
     settings: 'Configurações',
     system: 'Sistema',
@@ -8043,7 +8043,7 @@ export default {
   },
 
   modelSources: {
-    title: 'Fontes de modelos',
+    title: 'Modelos',
     tabMakerworld: 'MakerWorld',
     tabManyfold: 'Manyfold',
   },

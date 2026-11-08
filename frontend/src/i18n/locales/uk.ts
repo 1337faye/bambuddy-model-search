@@ -12,7 +12,7 @@ export default {
     finance: "Фінанси",
     files: "Менеджер файлів",
     makerworld: "MakerWorld",
-    modelSources: "Джерела моделей",
+    modelSources: "Моделі",
     notifications: "Сповіщення",
     settings: "Налаштування",
     system: "Система",
@@ -8098,7 +8098,7 @@ export default {
   },
 
   modelSources: {
-    title: "Джерела моделей",
+    title: "Моделі",
     tabMakerworld: "MakerWorld",
     tabManyfold: "Manyfold",
   },

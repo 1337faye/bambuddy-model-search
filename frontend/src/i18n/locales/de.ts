@@ -12,7 +12,7 @@ export default {
     inventory: 'Filament',
     files: 'Dateimanager',
     makerworld: 'MakerWorld',
-    modelSources: 'Modellquellen',
+    modelSources: 'Modelle',
     notifications: 'Benachrichtigungen',
     settings: 'Einstellungen',
     system: 'System',
@@ -8057,7 +8057,7 @@ export default {
   },
 
   modelSources: {
-    title: 'Modellquellen',
+    title: 'Modelle',
     tabMakerworld: 'MakerWorld',
     tabManyfold: 'Manyfold',
   },

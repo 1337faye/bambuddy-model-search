@@ -5,6 +5,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import i18n, { localeBackend } from '../../i18n';
 import en from '../../i18n/locales/en';
 import de from '../../i18n/locales/de';
+import { withModelsBrowseTranslations } from '../../i18n/modelsBrowse';
 
 function read(language: string) {
   return new Promise<{ error: unknown; data: unknown }>((resolve) => {
@@ -27,7 +28,7 @@ describe('locale loading', () => {
     const { error, data } = await read('de');
 
     expect(error).toBeNull();
-    expect(data).toEqual(de);
+    expect(data).toEqual(withModelsBrowseTranslations(de));
   });
 
   it('answers an unknown language with nothing, so English stays the fallback', async () => {

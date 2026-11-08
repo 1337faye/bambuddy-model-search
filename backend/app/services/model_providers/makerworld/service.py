@@ -50,7 +50,6 @@ from backend.app.services.model_providers.makerworld.errors import (
     MakerWorldUrlError,
 )
 from backend.app.services.model_providers.makerworld.http import (
-    _ALLOWED_DOWNLOAD_SUFFIXES,
     _CLIENT_HEADERS,
     _IMAGE_EXT_TO_MIME,
     _MAX_3MF_BYTES,
@@ -294,7 +293,13 @@ class MakerWorldService(ProviderService):
 
     async def download(self, info: ProviderDownloadInfo) -> ProviderDownload:
         """Fetch the 3MF bytes for a signed URL, returning ``(bytes, filename)``."""
+        from backend.app.services.model_providers.base import ProviderUnavailableError
+        from backend.app.services.model_providers.online import validate_model_file
         file_bytes, download_filename = await self.download_3mf(info.url)
+        try:
+            await asyncio.to_thread(validate_model_file, file_bytes, "model.3mf")
+        except ProviderUnavailableError as exc:
+            raise MakerWorldUnavailableError("MakerWorld sent a file that is not a valid 3MF or exceeds archive safety limits") from exc
         # A 3MF is a zip. A truncated body or an error page served with 200
         # would otherwise be stored, and kept, as the model's file.
         if not _is_readable_zip(file_bytes):
@@ -312,7 +317,12 @@ class MakerWorldService(ProviderService):
         a subsequent call; hammering beyond one retry provokes a stronger
         block, so we stop there and surface a useful error.
         """
-        url = f"{MAKERWORLD_API_BASE}{path}"
+        # Search is a separate Bambu service. design/search returns empty
+        # results; select/design2 and select/design/nav are the real catalogue.
+        if path.startswith("/search-service/"):
+            url = "https://api.bambulab.com/v1" + path
+        else:
+            url = f"{MAKERWORLD_API_BASE}{path}"
 
         for attempt in range(2):
             try:
@@ -395,6 +405,18 @@ class MakerWorldService(ProviderService):
                 f"MakerWorld returned unexpected JSON shape for {path}: {type(data).__name__}"
             )
         return data
+
+    async def browse(self, **kwargs) -> dict[str, Any]:
+        from .catalogue import browse
+        return await browse(self, **kwargs)
+
+    async def categories(self) -> list[dict[str, str]]:
+        from .catalogue import categories
+        return await categories(self)
+
+    async def detail(self, model_id: str) -> dict[str, Any]:
+        from .catalogue import detail
+        return await detail(self, model_id)
 
     async def get_design(self, model_id: int) -> dict[str, Any]:
         """Fetch full model metadata. Works anonymously.
@@ -555,7 +577,10 @@ class MakerWorldService(ProviderService):
             raise MakerWorldUrlError(f"Invalid download URL: {exc}") from exc
 
         host = (parsed.hostname or "").lower()
-        is_allowed = host in self._download_hosts or any(host.endswith(suffix) for suffix in _ALLOWED_DOWNLOAD_SUFFIXES)
+        if parsed.scheme != "https" or parsed.username or parsed.password or parsed.port not in (None, 443):
+            raise MakerWorldUrlError("MakerWorld downloads require an HTTPS CDN URL without credentials")
+        # Only Bambu's known regional S3 endpoints, not arbitrary AWS services.
+        is_allowed = host in self._download_hosts or host in ("s3.us-west-2.amazonaws.com", "s3.us-east-1.amazonaws.com", "s3.eu-central-1.amazonaws.com")
         if not is_allowed:
             raise MakerWorldUrlError(f"Refusing to download from non-MakerWorld host: {host!r}")
 

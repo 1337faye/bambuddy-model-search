@@ -2,6 +2,7 @@ import type { KProfileWriteResult } from '../utils/kprofileWrite';
 import type { BambuCatalogColor } from '../utils/colors';
 import type { ArchivePlatesResponse, LibraryFilePlatesResponse } from '../types/plates';
 import { batched, byField, byId } from './batch';
+import type { ModelProvider, ModelDetail, ModelsBrowseParams, ModelsBrowseResponse, PreparedModelFile } from '../types/models';
 
 const API_BASE = '/api/v1';
 
@@ -6601,6 +6602,26 @@ export const api = {
       `/inventory/colors/by-material?${params.toString()}`,
     );
   },
+
+  // Unified discovery. All downloads go through prepare; the browser never
+  // downloads provider files or hands them to a desktop slicer.
+  browseModels: (provider: ModelProvider, params: ModelsBrowseParams, signal?: AbortSignal) => {
+    const query = new URLSearchParams({ ...params, offset: String(params.offset), limit: String(params.limit) });
+    return request<ModelsBrowseResponse>(`/models/${provider}/browse?${query}`, { signal });
+  },
+  getModelCategories: (provider: ModelProvider, signal?: AbortSignal) =>
+    request<{ id: string; name: string }[]>(`/models/${provider}/categories`, { signal }),
+  getModelDetail: (provider: ModelProvider, id: string, signal?: AbortSignal) =>
+    request<ModelDetail>(`/models/${provider}/${encodeURIComponent(id)}`, { signal }),
+  getModelThumbnailUrl: (provider: ModelProvider, url: string) =>
+    withMediaToken(`${API_BASE}/models/${provider}/thumbnail?url=${encodeURIComponent(url)}`),
+  prepareModelFile: (provider: ModelProvider, id: string, data: {
+    file_id: string; action: 'save' | 'slice'; folder_id: number | null;
+  }) => request<PreparedModelFile>(`/models/${provider}/${encodeURIComponent(id)}/prepare`, {
+    method: 'POST', body: JSON.stringify(data),
+  }),
+  deleteTemporaryModelFile: (id: number) =>
+    request<void>(`/models/temporary/${id}`, { method: 'DELETE' }),
 
   // MakerWorld URL-paste import flow.
   getMakerworldStatus: () =>

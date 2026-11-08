@@ -5,9 +5,10 @@ it → shows plate list → one-click import/print. The URL-paste flow covers th
 actual discovery pattern (Reddit/YouTube/shared links) without needing to
 replicate the host's whole search UI.
 
-Search/browse endpoints are intentionally NOT exposed: the public-facing
-``design/search`` endpoint returns empty results from server-originated
-requests (see memory/makerworld-integration.md for the investigation).
+The old ``design/search`` endpoint returns empty results from server requests.
+Online discovery now lives at ``/models/makerworld/*`` and uses the separate
+working ``search-service/select/design2`` and trending interfaces. These routes
+remain the backwards-compatible URL import API.
 
 These are still the *MakerWorld* routes: they consult the shared seams where
 one exists — URL routing via :class:`ModelProviderRegistry`, permissions and

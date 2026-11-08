@@ -106,7 +106,10 @@ async def list_trash(
     retention_days = await library_trash_service.get_retention_days(db)
 
     # Base query: trashed files + their folder name (for the UI) + creator.
-    base_conditions = [LibraryFile.deleted_at.isnot(None)]
+    base_conditions = [
+        LibraryFile.deleted_at.isnot(None),
+        LibraryFile.source_type.is_(None) | (LibraryFile.source_type != "online_slice"),
+    ]
     if not can_modify_all:
         if user is None:
             # Defensive: ownership checker only returns user=None when auth is off,
