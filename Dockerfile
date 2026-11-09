@@ -61,14 +61,22 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Copy backend
 COPY backend/ ./backend/
 
-# Capture the current git branch at build time. `.git/HEAD` is the only
-# .git metadata the build context lets through (see .dockerignore); it
-# contains `ref: refs/heads/<branch>`, which the SpoolBuddy remote-update
-# flow reads at runtime via detect_current_branch() in spoolbuddy_ssh.py.
-# Without this, the production image has no git metadata at all and would
-# always pull `main` on the remote device regardless of which branch
-# Bambuddy itself was built from.
-COPY .git/HEAD ./.git/HEAD
+# Capture the git branch and commit at build time without requiring a
+# `.git` directory in the build context. The SpoolBuddy remote-update flow
+# reads `.git/HEAD` at runtime via detect_current_branch() in
+# spoolbuddy_ssh.py, so the file is generated here from build args instead
+# of being COPYd from the checkout. That keeps the image correct on build
+# systems that present a `.git`-less context (Coolify clones the repo and
+# strips `.git`, which made the old `COPY .git/HEAD` fail the build).
+#
+# Defaults are the safe fallback the runtime already implements: the
+# branch falls back to `main` and the commit is recorded as `unknown`.
+# Use --build-arg GIT_BRANCH=<branch> GIT_COMMIT=<sha> to override.
+ARG GIT_BRANCH=main
+ARG GIT_COMMIT=unknown
+RUN mkdir -p /app/.git \
+    && printf 'ref: refs/heads/%s\n' "${GIT_BRANCH}" > /app/.git/HEAD \
+    && printf '%s\n' "${GIT_COMMIT}" > /app/.git/BUILD_COMMIT
 
 # Copy built frontend from builder stage
 COPY --from=frontend-builder /app/static ./static
