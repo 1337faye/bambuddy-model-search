@@ -12,7 +12,7 @@ export default {
     inventory: '耗材',
     files: '文件管理器',
     makerworld: 'MakerWorld',
-    modelSources: '模型来源',
+    modelSources: '模型',
     notifications: '通知',
     settings: '设置',
     system: '系统',
@@ -8041,7 +8041,7 @@ export default {
   },
 
   modelSources: {
-    title: '模型来源',
+    title: '模型',
     tabMakerworld: 'MakerWorld',
     tabManyfold: 'Manyfold',
   },

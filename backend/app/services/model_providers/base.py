@@ -287,6 +287,16 @@ class ProviderService(ABC):
     pool is only closed by the owner.
     """
 
+    async def browse(self, *, query: str = "", sort: str = "trending", category: str | None = None,
+                     offset: int = 0, limit: int = 24) -> dict[str, Any]:
+        raise ProviderUnavailableError("This provider does not support online discovery")
+
+    async def categories(self) -> list[dict[str, str]]:
+        return []
+
+    async def detail(self, model_id: str) -> dict[str, Any]:
+        raise ProviderUnavailableError("This provider does not support online model details")
+
     @abstractmethod
     async def close(self) -> None:
         """Close the client if this service instance owns it."""

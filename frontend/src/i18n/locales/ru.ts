@@ -11,7 +11,7 @@ export default {
     finance: "Финансы",
     files: "Файловый менеджер",
     makerworld: "MakerWorld",
-    modelSources: "Источники моделей",
+    modelSources: "Модели",
     notifications: "Уведомления",
     settings: "Настройки",
     system: "Система",
@@ -7683,7 +7683,7 @@ export default {
   },
 
   modelSources: {
-    title: "Источники моделей",
+    title: "Модели",
     tabMakerworld: "MakerWorld",
     tabManyfold: "Manyfold",
   },

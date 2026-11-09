@@ -2386,9 +2386,12 @@ async def list_files(
         )
 
     user, can_read_all = auth_result
-    query = LibraryFile.active().options(
-        selectinload(LibraryFile.created_by),
-        selectinload(LibraryFile.tags),
+    # Online Slice sources are short-lived working inputs, not saved models.
+    # They remain addressable by ID for the existing SliceModal/queue only.
+    query = (
+        LibraryFile.active()
+        .where(LibraryFile.source_type.is_(None) | (LibraryFile.source_type != "online_slice"))
+        .options(selectinload(LibraryFile.created_by), selectinload(LibraryFile.tags))
     )
     if user is not None and not can_read_all:
         query = query.where(LibraryFile.created_by_id == user.id)
@@ -6353,7 +6356,10 @@ async def get_library_stats(
     # Stats exclude trashed files — users see counts/sizes for what's actually in the library.
     # Without LIBRARY_READ_ALL the stats reflect only the caller's own files —
     # match what the file list endpoint shows so the numbers stay consistent.
-    file_filters = [LibraryFile.deleted_at.is_(None)]
+    file_filters = [
+        LibraryFile.deleted_at.is_(None),
+        LibraryFile.source_type.is_(None) | (LibraryFile.source_type != "online_slice"),
+    ]
     if user is not None and not can_read_all:
         file_filters.append(LibraryFile.created_by_id == user.id)
 

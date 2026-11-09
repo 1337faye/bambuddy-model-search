@@ -362,7 +362,7 @@ export function Layout() {
       inventory: 'inventory:read',
       finance: 'cost_centers:read_own',
       files: ['library:read', 'library:read_own', 'library:read_all'],
-      makerworld: ['makerworld:view', 'manyfold:view'],
+      makerworld: ['makerworld:view', 'manyfold:view', 'library:read_own', 'library:read_all', 'library:read'],
       settings: 'settings:read',
       // The user-email-preferences API requires notifications:user_email, so
       // gate the nav item on the same permission (both default groups —

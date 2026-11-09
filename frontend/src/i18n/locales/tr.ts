@@ -12,7 +12,7 @@ export default {
     finance: 'Finans',
     files: 'Dosya Yöneticisi',
     makerworld: 'MakerWorld',
-    modelSources: 'Model Kaynakları',
+    modelSources: 'Modeller',
     notifications: 'Bildirimler',
     settings: 'Ayarlar',
     system: 'Sistem',
@@ -7996,7 +7996,7 @@ export default {
   },
 
   modelSources: {
-    title: 'Model Kaynakları',
+    title: 'Modeller',
     tabMakerworld: 'MakerWorld',
     tabManyfold: 'Manyfold',
   },

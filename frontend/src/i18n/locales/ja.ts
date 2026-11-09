@@ -12,7 +12,7 @@ export default {
     finance: 'ファイナンス',
     files: 'ファイル管理',
     makerworld: 'MakerWorld',
-    modelSources: 'モデルソース',
+    modelSources: 'モデル',
     notifications: '通知',
     settings: '設定',
     system: 'システム',
@@ -8057,7 +8057,7 @@ export default {
   },
 
   modelSources: {
-    title: 'モデルソース',
+    title: 'モデル',
     tabMakerworld: 'MakerWorld',
     tabManyfold: 'Manyfold',
   },
